@@ -12,7 +12,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @Route("login")
-@PageTitle("Вход | Reporter")
+@PageTitle("Вход | Reporter initializr")
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
     private final LoginForm loginForm = new LoginForm();
@@ -25,7 +25,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         addClassName("login-view");
         setJustifyContentMode(JustifyContentMode.CENTER);
         setAlignItems(Alignment.CENTER);
-        add(new H1("Reporter"), loginForm, createSignupButton());
+        add(new H1("Reporter initializr"), loginForm, createSignupButton());
     }
 
     private LoginI18n createI18n() {

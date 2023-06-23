@@ -6,7 +6,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.RolesAllowed;
 
 @PageTitle("Профиль")
-@RolesAllowed(value = {"ROLE_ADMIN"})
 @Route(value = "profile", layout = MainView.class)
 public class ProfileView extends AbstractView {
 

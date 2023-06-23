@@ -49,7 +49,8 @@ public class MainView extends AppLayout {
         final var tabs = new Tabs();
         tabs.add(
                 createTab(VaadinIcon.INFO, "Главная", IndexView.class),
-                createTab(VaadinIcon.USER, "Профиль", ProfileView.class)
+                createTab(VaadinIcon.USER, "Профиль", ProfileView.class),
+                createTab(VaadinIcon.USERS, "Пользователи", UserView.class)
         );
         tabs.setOrientation(Tabs.Orientation.VERTICAL);
         return tabs;
