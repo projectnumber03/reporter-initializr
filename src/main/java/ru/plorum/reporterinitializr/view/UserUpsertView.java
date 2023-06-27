@@ -1,8 +1,11 @@
 package ru.plorum.reporterinitializr.view;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -15,14 +18,14 @@ import com.vaadin.flow.shared.Registration;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import ru.plorum.reporterinitializr.component.ErrorNotification;
+import ru.plorum.reporterinitializr.model.License;
 import ru.plorum.reporterinitializr.model.Role;
 import ru.plorum.reporterinitializr.model.User;
+import ru.plorum.reporterinitializr.service.LicenseService;
 import ru.plorum.reporterinitializr.service.RoleService;
 import ru.plorum.reporterinitializr.service.UserService;
 import ru.plorum.reporterinitializr.util.LoginGenerator;
@@ -50,6 +53,10 @@ public class UserUpsertView extends AbstractView implements HasUrlParameter<Stri
 
     private final PasswordField passwordField = new PasswordField("Пароль");
 
+    private final DatePicker licenseFinishDateField = new DatePicker("Дата окончания лицензии");
+
+    private final ComboBox<License.Type> licenseTypeField = new ComboBox<>("Тип лицензии");
+
     private final Button generatePasswordButton = new Button("Создать пароль");
 
     private final MultiSelectComboBox<Role> rolesField = new MultiSelectComboBox<>("Роли");
@@ -66,8 +73,7 @@ public class UserUpsertView extends AbstractView implements HasUrlParameter<Stri
 
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${amount.users}")
-    private Integer userAmount;
+    private final LicenseService licenseService;
 
     @Override
     @PostConstruct
@@ -91,6 +97,8 @@ public class UserUpsertView extends AbstractView implements HasUrlParameter<Stri
         final var passwordLayout = new HorizontalLayout(passwordField, generatePasswordButton);
         passwordLayout.setAlignItems(Alignment.END);
         vertical.add(passwordLayout);
+        vertical.add(licenseFinishDateField);
+        vertical.add(createLicenseTypeField());
         rolesField.setItems(roleService.findAll());
         rolesField.setItemLabelGenerator(Role::getName);
         vertical.add(rolesField);
@@ -99,13 +107,16 @@ public class UserUpsertView extends AbstractView implements HasUrlParameter<Stri
         add(vertical);
     }
 
+    private Component createLicenseTypeField() {
+        licenseTypeField.setItems(License.Type.values());
+        licenseTypeField.setItemLabelGenerator(l -> StringUtils.capitalize(l.name().toLowerCase()));
+
+        return licenseTypeField;
+    }
+
     private Button createSaveButton() {
         saveListener = saveButton.addClickListener(e -> {
             if (!validate()) return;
-            if (userService.countAll() >= userAmount) {
-                new ErrorNotification("На Вашем тарифном плане установлено ограничение на количество пользователей!");
-                return;
-            }
             saveUser(new User(UUID.randomUUID()));
             saveButton.getUI().ifPresent(ui -> ui.navigate("users"));
         });
@@ -142,10 +153,6 @@ public class UserUpsertView extends AbstractView implements HasUrlParameter<Stri
         saveListener.remove();
         saveListener = saveButton.addClickListener(e -> {
             if (!validate()) return;
-            if (userService.countAll() >= userAmount) {
-                new ErrorNotification("На Вашем тарифном плане установлено ограничение на количество пользователей!");
-                return;
-            }
             saveUser(user.get());
             saveButton.getUI().ifPresent(ui -> ui.navigate("users"));
         });

@@ -23,7 +23,9 @@ import java.util.stream.Collectors;
 public class SetupDataLoader {
 
     private final PrivilegeRepository privilegeRepository;
+
     private final RoleRepository roleRepository;
+
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;

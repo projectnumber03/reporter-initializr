@@ -1,13 +1,11 @@
 package ru.plorum.reporterinitializr.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.Profile;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import ru.plorum.reporterinitializr.model.Privilege;
-import ru.plorum.reporterinitializr.model.Role;
 import ru.plorum.reporterinitializr.model.User;
 import ru.plorum.reporterinitializr.repository.UserRepository;
 
@@ -68,10 +66,9 @@ public class UserService {
     }
 
     public User getAuthenticatedUser() {
-//        final var login = SecurityContextHolder.getContext().getAuthentication().getName();
-//        if (!StringUtils.hasText(login)) return null;
-//        return userRepository.findByLogin(login).orElse(null);
-        return new User();
+        final var login = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!StringUtils.hasText(login)) return null;
+        return userRepository.findByLogin(login).orElse(null);
     }
 
     public Long countAll() {
