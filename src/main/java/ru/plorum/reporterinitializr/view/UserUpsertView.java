@@ -31,6 +31,7 @@ import ru.plorum.reporterinitializr.service.UserService;
 import ru.plorum.reporterinitializr.util.LoginGenerator;
 import ru.plorum.reporterinitializr.util.PasswordGenerator;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
@@ -75,6 +76,8 @@ public class UserUpsertView extends AbstractView implements HasUrlParameter<Stri
 
     private final LicenseService licenseService;
 
+    private final DatePicker.DatePickerI18n i18n;
+
     @Override
     @PostConstruct
     protected void initialize() {
@@ -97,7 +100,7 @@ public class UserUpsertView extends AbstractView implements HasUrlParameter<Stri
         final var passwordLayout = new HorizontalLayout(passwordField, generatePasswordButton);
         passwordLayout.setAlignItems(Alignment.END);
         vertical.add(passwordLayout);
-        vertical.add(licenseFinishDateField);
+        vertical.add(createLicenseFinishDateField());
         vertical.add(createLicenseTypeField());
         rolesField.setItems(roleService.findAll());
         rolesField.setItemLabelGenerator(Role::getName);
@@ -110,8 +113,15 @@ public class UserUpsertView extends AbstractView implements HasUrlParameter<Stri
     private Component createLicenseTypeField() {
         licenseTypeField.setItems(License.Type.values());
         licenseTypeField.setItemLabelGenerator(l -> StringUtils.capitalize(l.name().toLowerCase()));
+        licenseTypeField.setAllowCustomValue(false);
 
         return licenseTypeField;
+    }
+
+    private Component createLicenseFinishDateField() {
+        licenseFinishDateField.setI18n(i18n);
+
+        return licenseFinishDateField;
     }
 
     private Button createSaveButton() {
@@ -133,6 +143,10 @@ public class UserUpsertView extends AbstractView implements HasUrlParameter<Stri
         user.setCreatedOn(Optional.ofNullable(user.getCreatedOn()).orElse(LocalDateTime.now()));
         user.setEmail(emailField.getValue());
         userService.save(user);
+        final var license = licenseService.findByUser(user).orElse(new License(UUID.randomUUID(), user, LocalDate.now()));
+        license.setType(licenseTypeField.getValue());
+        license.setFinishDate(licenseFinishDateField.getValue());
+        licenseService.save(license);
     }
 
     @Override
@@ -150,6 +164,10 @@ public class UserUpsertView extends AbstractView implements HasUrlParameter<Stri
         passwordField.setValue(user.get().getPassword());
         rolesField.select(user.get().getRoles());
         blockField.setValue(!user.get().isActive());
+        licenseService.findByUser(user.get()).ifPresent(license -> {
+            licenseTypeField.setValue(license.getType());
+            licenseFinishDateField.setValue(license.getFinishDate());
+        });
         saveListener.remove();
         saveListener = saveButton.addClickListener(e -> {
             if (!validate()) return;

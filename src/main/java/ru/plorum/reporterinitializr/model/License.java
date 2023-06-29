@@ -35,6 +35,12 @@ public final class License {
     @Enumerated(EnumType.STRING)
     Type type;
 
+    public License(@NonNull final UUID id, final User user, final LocalDate startDate) {
+        this.id = id;
+        this.user = user;
+        this.startDate = startDate;
+    }
+
     public enum Type {
         FREE,
         PROFESSIONAL,

@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public final class MYSQLConnection extends Connection {
 
-    public MYSQLConnection(final TextField host, final NumberField port, final TextField login, final PasswordField password) {
-        super(host, port, login, password);
+    public MYSQLConnection(final TextField host, final NumberField port, final TextField login, final PasswordField password, final TextField name) {
+        super(host, port, login, password, name);
     }
 
     @Override

@@ -10,7 +10,6 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.server.StreamResource;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import ru.plorum.reporterinitializr.component.connection.*;
 import ru.plorum.reporterinitializr.model.License;
@@ -28,6 +27,8 @@ public class PresetTuning extends VerticalLayout {
 
     private final NumberField dbPortNumberField = new NumberField("Порт БД");
 
+    private final TextField dbNameField = new TextField("Схема БД");
+
     private final TextField dbUserField = new TextField("Пользователь БД");
 
     private final PasswordField dbPasswordField = new PasswordField("Пароль БД");
@@ -42,22 +43,25 @@ public class PresetTuning extends VerticalLayout {
 
     private final ZipService zipService;
 
-    @Setter
-    private License license;
+    private final License license;
 
-    public PresetTuning(final ZipService zipService) {
+    public PresetTuning(final ZipService zipService, final License license) {
         this.zipService = zipService;
+        this.license = license;
         dbTypeField.setItemLabelGenerator(Connection::getConnectionType);
+        final var h2Connection = new H2Connection(dbHostField, dbPortNumberField, dbUserField, dbPasswordField, dbNameField);
         dbTypeField.setItems(
-                new H2Connection(dbHostField, dbPortNumberField, dbUserField, dbPasswordField),
-                new MSSQLConnection(dbHostField, dbPortNumberField, dbUserField, dbPasswordField),
-                new MYSQLConnection(dbHostField, dbPortNumberField, dbUserField, dbPasswordField),
-                new OracleConnection(dbHostField, dbPortNumberField, dbUserField, dbPasswordField),
-                new PostgresConnection(dbHostField, dbPortNumberField, dbUserField, dbPasswordField)
+                h2Connection,
+                new MSSQLConnection(dbHostField, dbPortNumberField, dbUserField, dbPasswordField, dbNameField),
+                new MYSQLConnection(dbHostField, dbPortNumberField, dbUserField, dbPasswordField, dbNameField),
+                new OracleConnection(dbHostField, dbPortNumberField, dbUserField, dbPasswordField, dbNameField),
+                new PostgresConnection(dbHostField, dbPortNumberField, dbUserField, dbPasswordField, dbNameField)
         );
         add(portNumberField);
         if (Objects.nonNull(license) && Arrays.asList(License.Type.FREE, License.Type.PROFESSIONAL).contains(license.getType())) {
+            dbTypeField.setValue(h2Connection);
             dbHostField.setValue("database/reporter;AUTO_SERVER=true");
+            dbNameField.setValue("reporter");
             dbUserField.setValue("sa");
             dbPasswordField.setValue("123");
             adminLoginField.setValue("admin");
@@ -90,36 +94,23 @@ public class PresetTuning extends VerticalLayout {
             put("server.port", portNumberField.getValue().intValue());
             put("vaadin.productionMode", "true");
             put("vaadin.compatibilityMode", "false");
+            put("spring.datasource.url", dbTypeField.getValue().getConnectionString());
+            put("spring.datasource.driverClassName", dbTypeField.getValue().getDriver());
+            put("spring.datasource.username", dbTypeField.getValue().getLogin().getValue());
+            put("spring.datasource.password", dbTypeField.getValue().getPassword().getValue());
+            put("spring.jpa.database-platform", dbTypeField.getValue().getHibernateDialect());
+            put("spring.jpa.hibernate.ddl-auto", "update");
+            put("administrator.login", adminLoginField.getValue());
+            put("administrator.password", adminPasswordField.getValue());
+            put("jasypt.encryptor.password", "plorum");
+            put("system.domain", "localhost");
+            put("spring.mail.from", "dunderflute@yandex.ru");
+            put("spring.mail.host", "smtp.yandex.ru");
+            put("spring.mail.username", "dunderflute");
+            put("spring.mail.password", "syxlqgfuuwhplcwr");
+            put("spring.mail.port", "465");
+            put("spring.mail.protocol", "smtps");
         }};
     }
-
-    /*
-    spring.profiles.active=@spring.profiles.active@
-server.port=8081
-spring.devtools.restart.poll-interval=2s
-spring.devtools.restart.quiet-period=1s
-##vaadin
-vaadin.productionMode=false
-vaadin.compatibilityMode=false
-#database
-spring.datasource.url=jdbc:h2:file:./database/reporter;AUTO_SERVER=true
-spring.datasource.driverClassName=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=12345
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
-spring.jpa.hibernate.ddl-auto=update
-#admin
-administrator.login=admin
-administrator.password=123
-jasypt.encryptor.password=plorum
-system.domain=localhost
-#mail
-spring.mail.from=dunderflute@yandex.ru
-spring.mail.host=smtp.yandex.ru
-spring.mail.username=dunderflute
-spring.mail.password=syxlqgfuuwhplcwr
-spring.mail.port=465
-spring.mail.protocol=smtps
-    * */
 
 }

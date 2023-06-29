@@ -23,15 +23,11 @@ public class IndexView extends AbstractView {
 
     private final ZipService zipService;
 
-    private PresetTuning presetTuning = new PresetTuning(zipService);
-
     @Override
     @PostConstruct
     protected void initialize() {
         final var authenticatedUser = userService.getAuthenticatedUser();
-        final var license = licenseService.findByUser(authenticatedUser);
-        license.ifPresent(presetTuning::setLicense);
-        vertical.add(presetTuning);
+        licenseService.findByUser(authenticatedUser).ifPresent(license -> vertical.add(new PresetTuning(zipService, license)));
         add(vertical);
     }
 

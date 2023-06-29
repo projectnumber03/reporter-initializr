@@ -31,6 +31,8 @@ public class ZipService {
             final var jarEntry = new ZipEntry(String.format("reporter-%s.jar", postfix));
             zipOut.putNextEntry(jarEntry);
             IOUtils.copy(jarInputStream, zipOut);
+            jarInputStream.close();
+            zipOut.close();
 
             return new ByteArrayInputStream(zipOutputStream.toByteArray());
         } catch (Exception e) {

@@ -10,8 +10,8 @@ import org.springframework.util.StringUtils;
 @NoArgsConstructor
 public final class MSSQLConnection extends Connection {
 
-    public MSSQLConnection(final TextField host, final NumberField port, final TextField login, final PasswordField password) {
-        super(host, port, login, password);
+    public MSSQLConnection(final TextField host, final NumberField port, final TextField login, final PasswordField password, final TextField name) {
+        super(host, port, login, password, name);
     }
 
     @Override

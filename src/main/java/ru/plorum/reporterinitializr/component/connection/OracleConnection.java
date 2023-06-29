@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public final class OracleConnection extends Connection {
 
-    public OracleConnection(final TextField host, final NumberField port, final TextField login, final PasswordField password) {
-        super(host, port, login, password);
+    public OracleConnection(final TextField host, final NumberField port, final TextField login, final PasswordField password, final TextField name) {
+        super(host, port, login, password, name);
     }
 
     @Override

@@ -20,4 +20,9 @@ public class LicenseService {
         return licenseRepository.findByUser(user);
     }
 
+    public void save(final License license) {
+        if (Objects.isNull(license)) return;
+        licenseRepository.save(license);
+    }
+
 }

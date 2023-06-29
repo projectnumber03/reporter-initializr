@@ -3,15 +3,13 @@ package ru.plorum.reporterinitializr.component.connection;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class Connection {
 
@@ -23,14 +21,7 @@ public abstract class Connection {
 
     PasswordField password;
 
-    String name;
-
-    public Connection(final TextField host, final NumberField port, final TextField login, final PasswordField password) {
-        this.host = host;
-        this.port = port;
-        this.login = login;
-        this.password = password;
-    }
+    TextField name;
 
     public abstract String getConnectionString();
 
