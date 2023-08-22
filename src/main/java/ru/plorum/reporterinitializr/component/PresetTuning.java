@@ -91,17 +91,17 @@ public class PresetTuning extends VerticalLayout {
     private Map<String, Object> getProperties() {
         return new HashMap<>(){{
             put("spring.profiles.active", "@spring.profiles.active@");
-            put("server.port", portNumberField.getValue().intValue());
+            Optional.ofNullable(portNumberField.getValue()).map(Double::intValue).ifPresent(port -> put("server.port", port));
             put("vaadin.productionMode", "true");
             put("vaadin.compatibilityMode", "false");
-            put("spring.datasource.url", dbTypeField.getValue().getConnectionString());
-            put("spring.datasource.driverClassName", dbTypeField.getValue().getDriver());
-            put("spring.datasource.username", dbTypeField.getValue().getLogin().getValue());
-            put("spring.datasource.password", dbTypeField.getValue().getPassword().getValue());
-            put("spring.jpa.database-platform", dbTypeField.getValue().getHibernateDialect());
+            Optional.ofNullable(dbTypeField.getValue()).map(Connection::getConnectionString).ifPresent(cs -> put("spring.datasource.url", cs));
+            Optional.ofNullable(dbTypeField.getValue()).map(Connection::getDriver).ifPresent(driver -> put("spring.datasource.driverClassName", driver));
+            Optional.ofNullable(dbTypeField.getValue()).map(Connection::getLogin).ifPresent(login -> put("spring.datasource.username", login));
+            Optional.ofNullable(dbTypeField.getValue()).map(Connection::getPassword).ifPresent(password -> put("spring.datasource.password", password));
+            Optional.ofNullable(dbTypeField.getValue()).map(Connection::getHibernateDialect).ifPresent(dialect -> put("spring.jpa.database-platform", dialect));
             put("spring.jpa.hibernate.ddl-auto", "update");
-            put("administrator.login", adminLoginField.getValue());
-            put("administrator.password", adminPasswordField.getValue());
+            Optional.ofNullable(adminLoginField.getValue()).ifPresent(login -> put("administrator.login", login));
+            Optional.ofNullable(adminPasswordField.getValue()).ifPresent(password -> put("administrator.password", password));
             put("jasypt.encryptor.password", "plorum");
             put("system.domain", "localhost");
             put("spring.mail.from", "dunderflute@yandex.ru");
