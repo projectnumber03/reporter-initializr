@@ -5,6 +5,7 @@ import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H6;
@@ -21,11 +22,16 @@ import com.vaadin.flow.server.VaadinSession;
 import lombok.Getter;
 import ru.plorum.reporterinitializr.model.Role;
 import ru.plorum.reporterinitializr.service.UserService;
+import ru.plorum.reporterinitializr.view.profile.ProfileView;
+import ru.plorum.reporterinitializr.view.user.UserView;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static ru.plorum.reporterinitializr.util.Constants.*;
 
+@CssImport(value = "./css/vaadin-menu-bar-button.css", themeFor = "vaadin-menu-bar-button")
 public class MainView extends AppLayout {
 
     private final UserService userService;
@@ -35,22 +41,39 @@ public class MainView extends AppLayout {
 
     public MainView(final UserService userService) {
         this.userService = userService;
+
+        final var user = userService.getAuthenticatedUser();
+
         final var toggle = new DrawerToggle();
-        final var title = new H1("Reporter initializr");
+        final var title = new H1(APP_NAME);
         title.getStyle().set("font-size", "var(--lumo-font-size-l)").set("margin", "0");
         final var mainMenuHeader = new H6("Главное меню");
         mainMenuHeader.getStyle().set("padding", "10px 25px 10px 15px");
         addToDrawer(mainMenuHeader);
-        addToDrawer(getTabs());
+        addToDrawer(getMainMenuTabs());
         addToNavbar(toggle, title, createUserData());
+        if (Objects.isNull(user) || user.getRoles().stream().noneMatch(r -> ROLE_ADMIN.equals(r.getName()))) return;
+        final var adminMenuHeader = new H6("Панель администратора");
+        adminMenuHeader.getStyle().set("padding", "10px 25px 10px 15px");
+        addToDrawer(adminMenuHeader);
+        addToDrawer(getAdminMenuTabs());
     }
 
-    private Tabs getTabs() {
+    private Tabs getMainMenuTabs() {
         final var tabs = new Tabs();
         tabs.add(
                 createTab(VaadinIcon.INFO, "Главная", IndexView.class),
-                createTab(VaadinIcon.USER, "Профиль", ProfileView.class),
+                createTab(VaadinIcon.USER, PROFILE, ProfileView.class),
                 createTab(VaadinIcon.USERS, "Пользователи", UserView.class)
+        );
+        tabs.setOrientation(Tabs.Orientation.VERTICAL);
+        return tabs;
+    }
+
+    private Tabs getAdminMenuTabs() {
+        final var tabs = new Tabs();
+        tabs.add(
+                createTab(VaadinIcon.USERS, "Клиенты", ClientView.class)
         );
         tabs.setOrientation(Tabs.Orientation.VERTICAL);
         return tabs;

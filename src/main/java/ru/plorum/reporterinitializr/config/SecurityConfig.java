@@ -12,7 +12,7 @@ public class SecurityConfig extends VaadinWebSecurity {
 
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests().requestMatchers("/images/*.png").permitAll();
+        http.authorizeHttpRequests(auth -> auth.requestMatchers("/images/*.png").permitAll());
         super.configure(http);
         setLoginView(http, LoginView.class);
     }

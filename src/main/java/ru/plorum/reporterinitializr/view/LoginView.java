@@ -11,8 +11,10 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import static ru.plorum.reporterinitializr.util.Constants.APP_NAME;
+
 @Route("login")
-@PageTitle("Вход | Reporter initializr")
+@PageTitle("Вход | " + APP_NAME)
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
     private final LoginForm loginForm = new LoginForm();
@@ -25,7 +27,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         addClassName("login-view");
         setJustifyContentMode(JustifyContentMode.CENTER);
         setAlignItems(Alignment.CENTER);
-        add(new H1("REPORTER INITIALIZR"), loginForm, createSignupButton());
+        add(new H1(APP_NAME.toUpperCase()), loginForm, createSignupButton());
     }
 
     private LoginI18n createI18n() {

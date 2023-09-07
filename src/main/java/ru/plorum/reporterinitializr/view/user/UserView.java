@@ -1,4 +1,4 @@
-package ru.plorum.reporterinitializr.view;
+package ru.plorum.reporterinitializr.view.user;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -26,11 +26,15 @@ import ru.plorum.reporterinitializr.component.pagination.PaginatedGrid;
 import ru.plorum.reporterinitializr.model.Role;
 import ru.plorum.reporterinitializr.model.User;
 import ru.plorum.reporterinitializr.service.UserService;
+import ru.plorum.reporterinitializr.view.AbstractView;
+import ru.plorum.reporterinitializr.view.MainView;
 
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static ru.plorum.reporterinitializr.util.Constants.*;
 
 @PageTitle("Пользователи")
 @RolesAllowed(value = {"ROLE_ADMIN"})
@@ -64,9 +68,9 @@ public class UserView extends AbstractView {
 
     private PaginatedGrid<User> createUserTable() {
         final Grid<User> grid = new Grid<>();
-        grid.addColumn(createEditButtonRenderer()).setHeader("Пользователь");
-        grid.addColumn(User::getName).setHeader("ФИО");
-        grid.addColumn(User::getEmail).setHeader("Email");
+        grid.addColumn(createEditButtonRenderer()).setHeader(USER);
+        grid.addColumn(User::getName).setHeader(FIO);
+        grid.addColumn(User::getEmail).setHeader(EMAIL);
         grid.addColumn(u -> u.getRoles().stream().map(Role::getName).collect(Collectors.joining(", "))).setHeader("Роли");
         grid.addColumn(user -> DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(user.getCreatedOn())).setHeader("Создан");
         grid.addColumn(new ComponentRenderer<>(u -> {

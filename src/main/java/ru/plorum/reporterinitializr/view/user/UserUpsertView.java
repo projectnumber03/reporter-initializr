@@ -1,4 +1,4 @@
-package ru.plorum.reporterinitializr.view;
+package ru.plorum.reporterinitializr.view.user;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -30,6 +30,9 @@ import ru.plorum.reporterinitializr.service.RoleService;
 import ru.plorum.reporterinitializr.service.UserService;
 import ru.plorum.reporterinitializr.util.LoginGenerator;
 import ru.plorum.reporterinitializr.util.PasswordGenerator;
+import ru.plorum.reporterinitializr.view.AbstractView;
+import ru.plorum.reporterinitializr.view.MainView;
+import ru.plorum.reporterinitializr.view.Validatable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,16 +40,18 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
+import static ru.plorum.reporterinitializr.util.Constants.*;
 
-@PageTitle("Пользователь")
+
+@PageTitle(USER)
 @RequiredArgsConstructor
 @RolesAllowed(value = {"ROLE_ADMIN"})
 @Route(value = "users/upsert", layout = MainView.class)
 public class UserUpsertView extends AbstractView implements HasUrlParameter<String>, Validatable {
 
-    private final TextField fioField = new TextField("ФИО");
+    private final TextField fioField = new TextField(FIO);
 
-    private final TextField emailField = new TextField("Email");
+    private final TextField emailField = new TextField(EMAIL);
 
     private final TextField loginField = new TextField("Логин");
 
@@ -64,7 +69,7 @@ public class UserUpsertView extends AbstractView implements HasUrlParameter<Stri
 
     private final Checkbox blockField = new Checkbox("Заблокировать");
 
-    private final Button saveButton = new Button("Сохранить");
+    private final Button saveButton = new Button(SAVE);
 
     private Registration saveListener;
 
@@ -134,7 +139,7 @@ public class UserUpsertView extends AbstractView implements HasUrlParameter<Stri
     }
 
     @Transactional
-    protected void saveUser(final User user) {
+    public void saveUser(final User user) {
         user.setActive(!blockField.getValue());
         user.setName(fioField.getValue());
         user.setLogin(loginField.getValue());
@@ -179,10 +184,9 @@ public class UserUpsertView extends AbstractView implements HasUrlParameter<Stri
     @Override
     public boolean validate() {
         final Binder<User> binder = new BeanValidationBinder<>(User.class);
-        final String requiredField = "Поле обязательно к заполнению";
-        binder.forField(fioField).asRequired(requiredField).bind(User::getName, User::setName);
-        binder.forField(loginField).asRequired(requiredField).bind(User::getName, User::setName);
-        binder.forField(passwordField).asRequired(requiredField).bind(User::getName, User::setName);
+        binder.forField(fioField).asRequired(REQUIRED_FIELD).bind(User::getName, User::setName);
+        binder.forField(loginField).asRequired(REQUIRED_FIELD).bind(User::getName, User::setName);
+        binder.forField(passwordField).asRequired(REQUIRED_FIELD).bind(User::getName, User::setName);
         binder.forField(blockField).withValidator(bf -> !bf || !loginField.getValue().equals(Optional.ofNullable(userService.getAuthenticatedUser()).map(User::getLogin).orElse(null)), "Нельзя заблокировать самого себя");
         return binder.validate().isOk();
     }

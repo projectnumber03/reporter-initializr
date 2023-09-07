@@ -1,0 +1,37 @@
+server:
+  port: 8081
+  ssl:
+    key-store-password: plorum123
+    key-store: classpath:keystore/plorum.p12
+    key-password: plorum123
+    key-store-type: PKCS12
+    key-alias: plorum
+    enabled: true
+vaadin:
+  productionMode: false
+  compatibilityMode: false
+spring:
+  mail:
+    username: dunderflute
+    port: 465
+    from: dunderflute@yandex.ru
+    host: smtp.yandex.ru
+    protocol: smtps
+    password: syxlqgfuuwhplcwr
+  datasource:
+    driverClassName: org.h2.Driver
+    password: 12345
+    username: sa
+    url: jdbc:h2:file:./database/reporter-initializr;AUTO_SERVER=true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.H2Dialect
+administrator:
+  login: admin
+  password: 123
+jasypt:
+  encryptor:
+    password: plorum
+system:
+  domain: localhost
